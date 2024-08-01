@@ -11,16 +11,27 @@ def merge(load_dt="20240724"):
        'repNationCd', #한국외국영화 유무
        ]
     df = read_df[cols]
-    # 울버린 만조회
-    df_where = df[df['movieCd'] == '20247781'].copy() #날짜조건 load_dt 인자 받기
-    print(df_where)
-    print(df_where.dtypes)
+    # 울버린 만조회 지우고 ...
+    dw = df[(df['movieCd'] == '20235974') & (df['load_dt'] == int(load_dt))].copy() #날짜조건 load_dt 인자 받기 print(dw)
+    print(dw.dtypes)
 
     # 카테고리 타입 -> Object
-    df_where['load_dt'] = df_where['load_dt'].astype('object')
-    df_where['multiMovieYn'] = df_where['multiMovieYn'].astype('object')
-    df_where['repNationCd'] = df_where['repNationCd'].astype('object')
-    print(df_where.dtypes)
-    return df_where
+    dw['load_dt'] = dw['load_dt'].astype('object')
+    dw['multiMovieYn'] = dw['multiMovieYn'].astype('object')
+    dw['repNationCd'] = dw['repNationCd'].astype('object')
 
+    # NaN 값 unknown 으로 변경
+    dw['multiMovieYn'] = dw['multiMovieYn'].fillna('unknown')
+    dw['repNationCd'] = dw['repNationCd'].fillna('unknown')
+    print(dw.dtypes)
+    print(dw)
+
+    # 머지
+    u_mul = dw[dw['multiMovieYn'] == 'unknown']
+    u_nat = dw[dw['repNationCd'] == 'unknown']
+    m_df = pd.merge(u_mul, u_nat, on='movieCd', suffixes=('_m', '_n'))
+
+    print("머지 DF")
+    print(m_df)
+    return m_df
 merge()
